@@ -12,7 +12,7 @@ def main():
   start = time.time()
   base_url = "https://www.hockey-reference.com"
 
-  years = range(2015, 2020)
+  years = range(2019, 2020)
   serialized_games = []
   for year in years:
     urls_by_team = {team: f"{base_url}/teams/{team}/{year}_gamelog.html" for team in teams.team_name_by_abbr.keys()}
@@ -25,8 +25,9 @@ def main():
         serialized_games.append(serialize(winner, loser, num_penalties, game_url))
     deduped_serialized_games = set(serialized_games)
 
-    with open(f"{year}.csv", 'w', newline="") as file:
+    with open(f"data/{year}.csv", 'w', newline="") as file:
       writer = csv.writer(file, delimiter=",")
+      print("game_id,winner,loser,num_penalties")
       for serialized_game in deduped_serialized_games:
         # The things I do to not do work in Excel
         writer.writerow(serialized_game.split(","))

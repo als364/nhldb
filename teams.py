@@ -28,8 +28,8 @@ team_name_by_abbr = {
   "TBL": "Tampa Bay Lightning",
   "TOR": "Toronto Maple Leafs",
   "VAN": "Vancouver Canucks",
-  "VGK": "Vegas Golden Knights",
-  "WAS": "Washington Capitals",
+  "VEG": "Vegas Golden Knights",
+  "WSH": "Washington Capitals",
   "WPG": "Winnipeg Jets"
 }
 
@@ -62,7 +62,7 @@ team_abbrs_by_name = {
   "Tampa Bay Lightning": "TBL",
   "Toronto Maple Leafs": "TOR",
   "Vancouver Canucks": "VAN",
-  "Vegas Golden Knights": "VGK",
-  "Washington Capitals": "WAS",
+  "Vegas Golden Knights": "VEG",
+  "Washington Capitals": "WSH",
   "Winnipeg Jets": "WPG"
 }
