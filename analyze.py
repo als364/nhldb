@@ -6,8 +6,7 @@ import teams
 def main():
   teams = parse().teams
   
-  # years = range(2019, 2020)
-  years = [20172019]
+  years = range(2019, 2020)
   games = []
   for year in years:
     with open(f"data/{year}.csv") as file:
