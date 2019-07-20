@@ -13,8 +13,8 @@ def main():
   base_url = "https://www.hockey-reference.com"
 
   years = range(2019, 2020)
-  serialized_games = []
   for year in years:
+    serialized_games = []
     urls_by_team = {team: f"{base_url}/teams/{team}/{year}_gamelog.html" for team in teams.team_name_by_abbr.keys()}
     for team, url in urls_by_team.items():
       print(f"{time.asctime(time.localtime())}: Scraping {team} games", flush=True)
