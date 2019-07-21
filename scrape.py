@@ -12,12 +12,13 @@ def main():
   start = time.time()
   base_url = "https://www.hockey-reference.com"
 
-  years = range(2019, 2020)
+  years = range(2015, 2020)
   for year in years:
     serialized_games = []
-    urls_by_team = {team: f"{base_url}/teams/{team}/{year}_gamelog.html" for team in teams.team_name_by_abbr.keys()}
+    active_teams_by_abbr = {abbr: team for abbr, team in teams.teams_by_abbr().items() if team.stint_by_year(year) is not None}
+    urls_by_team = {team: f"{base_url}/teams/{team.stint_by_year(year).abbr}/{year}_gamelog.html" for abbr, team in active_teams_by_abbr.items()}
     for team, url in urls_by_team.items():
-      print(f"{time.asctime(time.localtime())}: Scraping {team} games", flush=True)
+      print(f"{time.asctime(time.localtime())}: Scraping {team.stint_by_year(year).abbr} games from {year}", flush=True)
       game_urls = extract.get_game_urls_from_gamelog(simple_get(url).content, base_url)
       for game_url in game_urls:
         print(f"{time.asctime(time.localtime())}: Scraping {game_url}", flush=True)
@@ -27,7 +28,7 @@ def main():
 
     with open(f"data/{year}.csv", 'w', newline="") as file:
       writer = csv.writer(file, delimiter=",")
-      print("game_id,winner,loser,num_penalties")
+      writer.writerow("game_id", "winner", "loser", "num_penalties")
       for serialized_game in deduped_serialized_games:
         # The things I do to not do work in Excel
         writer.writerow(serialized_game.split(","))

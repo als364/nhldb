@@ -22,7 +22,8 @@ def get_penalties_from_game(html):
   team_info = {}
   for div in performers:
     team = div.find("a", itemprop="name").string
-    abbr = teams.team_abbrs_by_name[team]
+    # TODO: figure out Winnipeg
+    abbr = teams.team_abbrs_by_name[team][0]
 
     # Scores are kept one div up for what are presumably some arcane CSS reasons
     score = div.parent.find("div", class_="score").string
