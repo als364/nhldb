@@ -9,21 +9,23 @@ import teams
 #
 # Inputs:
 #   html: A string of raw html, scraped from a hockey-reference game page
+#   year: The year in which the game took place.
 #
 # Outputs:
 #   A tuple of winner, loser, and number_of_fighting_penalties, where
 #   'fighting' encompasses both fighting and roughing penalties.
 ###############################################################################
-def get_penalties_from_game(html):
+def get_penalties_from_game(html, year):
   soup = BeautifulSoup(html, "html.parser")
 
   scorebox = soup.find(class_="scorebox")
   performers = scorebox.find_all(itemprop="performer")
   team_info = {}
   for div in performers:
-    team = div.find("a", itemprop="name").string
-    # TODO: figure out Winnipeg
-    abbr = teams.team_abbrs_by_name[team][0]
+    team_name = div.find("a", itemprop="name").string
+    team = teams.teams_by_name()[team_name]
+    stint = team.stint_by_year(year)
+    abbr = stint.abbr
 
     # Scores are kept one div up for what are presumably some arcane CSS reasons
     score = div.parent.find("div", class_="score").string
@@ -42,8 +44,8 @@ def get_penalties_from_game(html):
 # get_game_urls_from_gamelog
 #
 # Inputs:
-#   html:     A string of raw html, scraped from a hockey-reference team
-#             season gamelog
+#   html: A string of raw html, scraped from a hockey-reference team
+#         season gamelog
 #   base_url: The url of the scraped website because for SOME REASON these
 #             hrefs are relative
 #
@@ -56,5 +58,46 @@ def get_game_urls_from_gamelog(html, base_url):
   gamelog = soup.find(id="tm_gamelog_rs")
   game_rows = gamelog.find_all(id=re.compile("tm_gamelog_rs."))
   link_containers = [game_row.find(attrs={"data-stat": "date_game"}) for game_row in game_rows]
+  links = [base_url + link_container.find("a").get("href") for link_container in link_containers]
+  return links
+
+###############################################################################
+# get_series_urls_from_playoffs_summary
+#
+# Inputs:
+#   html: A string of raw html, scraped from a hockey-reference team
+#         playoffs summary
+#   base_url: The url of the scraped website because for SOME REASON these
+#             hrefs are relative
+#
+# Outputs:
+#   A list of urls of hockey-reference series pages
+###############################################################################
+def get_series_urls_from_playoffs_summary(html, base_url):
+  soup = BeautifulSoup(html, "html.parser")
+
+  playoff_table = soup.find(id="all_playoffs")
+  link_tags = playoff_table.find_all("a", string=re.compile("View Matchup"))
+  links = [base_url + link_container.get("href") for link_container in link_tags]
+  return links
+
+###############################################################################
+# get_game_urls_from_series
+#
+# Inputs:
+#   html: A string of raw html, scraped from a hockey-reference team
+#         playoffs summary
+#   base_url: The url of the scraped website because for SOME REASON these
+#             hrefs are relative
+#
+# Outputs:
+#   A list of urls of hockey-reference game pages for a playoff series
+###############################################################################
+def get_game_urls_from_series(html, base_url):
+  soup = BeautifulSoup(html, "html.parser")
+
+  content = soup.find(id="content")
+  series_table = content.find(class_="game_summaries")
+  link_containers = series_table.find_all(class_="gamelink")
   links = [base_url + link_container.find("a").get("href") for link_container in link_containers]
   return links

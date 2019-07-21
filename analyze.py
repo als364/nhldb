@@ -6,25 +6,32 @@ import teams
 def main():
   teams = parse().teams
   
-  years = range(2019, 2020)
+  years = range(2015, 2020)
   games = []
   for year in years:
     with open(f"data/{year}.csv") as file:
-      year_games = [line.split(",") for line in file.readlines()]
-      team_games = [year_game for year_game in year_games if year_game[1] in teams and year_game[2] in teams]
-      for team_game in team_games:
-        team_game_map = {
-          "game_id": team_game[0],
-          "winner": team_game[1],
-          "loser": team_game[2],
-          "num_penalties": int(team_game[3])
-        }
-        games.append(team_game_map)
+      games.extend(munge(teams, file.readlines()))
+    with open(f"data/{year}_playoffs.csv") as file:
+      games.extend(munge(teams, file.readlines()))
 
   p_team_1 = conditional_probability(games, teams[0])
   print(f"The conditional probability of {teams[0]} winning a game with a fight is {p_team_1}")
   p_team_2 = conditional_probability(games, teams[1])
   print(f"The conditional probability of {teams[1]} winning a game with a fight is {p_team_2}")
+
+def munge(teams, csvlines):
+  year_games = [line.split(",") for line in csvlines]
+  team_games = [year_game for year_game in year_games if year_game[1] in teams and year_game[2] in teams]
+  games = []
+  for team_game in team_games:
+    team_game_map = {
+      "game_id": team_game[0],
+      "winner": team_game[1],
+      "loser": team_game[2],
+      "num_penalties": int(team_game[3])
+    }
+    games.append(team_game_map)
+  return games
 
 def conditional_probability(games, winner):
   count = len(games)
@@ -41,7 +48,7 @@ def parse():
   parser.add_argument(
     'teams',
     metavar="T",
-    choices=teams.team_name_by_abbr.keys(),
+    choices=teams.teams_by_abbr().keys(),
     nargs=2,
     help="The three-letter abbreviations of the two teams to compare"
   )
