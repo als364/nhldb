@@ -5,6 +5,7 @@ from os import path
 import csv
 import time
 
+import constants
 import extract
 import teams
 
@@ -13,7 +14,7 @@ def main():
   start = time.time()
   base_url = "https://www.hockey-reference.com"
 
-  years = range(2010, 2020)
+  years = range(constants.FIRST_YEAR, constants.PRESENT_YEAR + 1)
   for year in years:
     regular_season_serialized_games = []
     regular_season_filename = f"data/{year}.csv"

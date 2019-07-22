@@ -1,13 +1,13 @@
 import argparse
 
+import constants
 import teams
-
 
 def main():
   args = parse()
   teams = args.teams
 
-  years = range(2015, 2020)
+  years = range(constants.FIRST_YEAR, constants.PRESENT_YEAR + 1)
   games = []
   for year in years:
     with open(f"data/{year}.csv") as file:
