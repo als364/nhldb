@@ -13,7 +13,7 @@ def main():
   start = time.time()
   base_url = "https://www.hockey-reference.com"
 
-  years = range(2015, 2020)
+  years = range(2010, 2020)
   for year in years:
     regular_season_serialized_games = []
     regular_season_filename = f"data/{year}.csv"

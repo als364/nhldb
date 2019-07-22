@@ -4,21 +4,33 @@ import teams
 
 
 def main():
-  teams = parse().teams
-  
+  args = parse()
+  teams = args.teams
+
   years = range(2015, 2020)
   games = []
   for year in years:
     with open(f"data/{year}.csv") as file:
       games.extend(munge(teams, file.readlines()))
-    with open(f"data/{year}_playoffs.csv") as file:
-      games.extend(munge(teams, file.readlines()))
+    if args.include_playoffs:
+      with open(f"data/{year}_playoffs.csv") as file:
+        games.extend(munge(teams, file.readlines()))
 
   p_team_1 = conditional_probability(games, teams[0])
   print(f"The conditional probability of {teams[0]} winning a game with a fight is {p_team_1}")
-  p_team_2 = conditional_probability(games, teams[1])
-  print(f"The conditional probability of {teams[1]} winning a game with a fight is {p_team_2}")
 
+###############################################################################
+# munge
+#
+# Munges data from a csv with game data into a data structure.
+#
+# Inputs:
+#   teams: A tuple of team abbrs to pull data for.
+#   csvlines: A list of serialized game data.
+#
+# Outputs:
+#   A list of maps of games played between the two teams.
+###############################################################################
 def munge(teams, csvlines):
   year_games = [line.split(",") for line in csvlines]
   team_games = [year_game for year_game in year_games if year_game[1] in teams and year_game[2] in teams]
@@ -33,6 +45,16 @@ def munge(teams, csvlines):
     games.append(team_game_map)
   return games
 
+###############################################################################
+# conditional_probability
+#
+# Inputs:
+#   games: A list of game data maps.
+#   winner: The team for which to calculate P(win|fight).
+#
+# Outputs:
+#   The probability that the winner wins a game, given a fight
+###############################################################################
 def conditional_probability(games, winner):
   count = len(games)
   games_with_fight = len([game for game in games if game["num_penalties"] > 0])
@@ -46,11 +68,18 @@ def parse():
     + "of one team winning against another team with and without a fight"
     + "in the game")
   parser.add_argument(
-    'teams',
+    "teams",
     metavar="T",
     choices=teams.teams_by_abbr().keys(),
     nargs=2,
     help="The three-letter abbreviations of the two teams to compare"
+  )
+  parser.add_argument(
+    "-i",
+    "--include-playoffs",
+    action="store_true",
+    default=False,
+    help="Whether or not to include playoff data. Default: False"
   )
   return parser.parse_args()
 

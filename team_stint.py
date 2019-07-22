@@ -1,10 +1,11 @@
 class Team_Stint:
-  def __init__(self, abbr, name, start, end, next_abbr):
+  def __init__(self, abbr, name, start, end, next_abbr, prev_abbr):
     self.abbr = abbr
     self.name = name
     self.start = start
     self.end = end
     self.next_abbr = next_abbr
+    self.prev_abbr = prev_abbr
 
   def __str__(self):
     string = f"{self.name} ({self.abbr}): {self.start}-{self.end}."
