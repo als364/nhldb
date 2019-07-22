@@ -51,6 +51,3 @@ present_teams = extract_data_from_csv("data/stints.csv")
 
 def teams_by_abbr():
   return present_teams
-
-def teams_by_name():
-  return {team.name: team for abbr, team in present_teams.items()}

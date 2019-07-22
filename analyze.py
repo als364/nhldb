@@ -16,8 +16,10 @@ def main():
       with open(f"data/{year}_playoffs.csv") as file:
         games.extend(munge(teams, file.readlines()))
 
-  p_team_1 = conditional_probability(games, teams[0])
-  print(f"The conditional probability of {teams[0]} winning a game with a fight is {p_team_1}")
+  p_win_fight = calc_win_given_fight(games, teams[0])
+  print(f"The conditional probability of {teams[0]} winning a game with a fight is {p_win_fight}")
+  p_win_no_fight = calc_win_given_no_fight(games, teams[0])
+  print(f"The conditional probability of {teams[0]} winning a game without a fight is {p_win_no_fight}")
 
 ###############################################################################
 # munge
@@ -46,21 +48,39 @@ def munge(teams, csvlines):
   return games
 
 ###############################################################################
-# conditional_probability
+# calc_win_given_fight
 #
 # Inputs:
 #   games: A list of game data maps.
 #   winner: The team for which to calculate P(win|fight).
 #
 # Outputs:
-#   The probability that the winner wins a game, given a fight
+#   The conditional probability that the winner wins a game, given a fight
 ###############################################################################
-def conditional_probability(games, winner):
+def calc_win_given_fight(games, winner):
   count = len(games)
   games_with_fight = len([game for game in games if game["num_penalties"] > 0])
   games_with_win_and_fight = len([game for game in games if game["winner"] == winner and game["num_penalties"] > 0])
   p_win_and_fight = games_with_win_and_fight / count
   p_fight = games_with_fight / count
+  return p_win_and_fight / p_fight
+
+###############################################################################
+# calc_win_given_no_fight
+#
+# Inputs:
+#   games: A list of game data maps.
+#   winner: The team for which to calculate P(win|no fight).
+#
+# Outputs:
+#   The conditional probability that the winner wins a game, given no fight
+###############################################################################
+def calc_win_given_no_fight(games, winner):
+  count = len(games)
+  games_without_fight = len([game for game in games if game["num_penalties"] == 0])
+  games_without_win_and_fight = len([game for game in games if game["winner"] == winner and game["num_penalties"] == 0])
+  p_win_and_fight = games_without_win_and_fight / count
+  p_fight = games_without_fight / count
   return p_win_and_fight / p_fight
 
 def parse():

@@ -22,10 +22,8 @@ def get_penalties_from_game(html, year):
   performers = scorebox.find_all(itemprop="performer")
   team_info = {}
   for div in performers:
-    team_name = div.find("a", itemprop="name").string
-    team = teams.teams_by_name()[team_name]
-    stint = team.stint_by_year(year)
-    abbr = stint.abbr
+    team_link = div.find("a", itemprop="name")['href']
+    abbr = re.findall("[A-Z]{3}", team_link)[0]
 
     # Scores are kept one div up for what are presumably some arcane CSS reasons
     score = div.parent.find("div", class_="score").string

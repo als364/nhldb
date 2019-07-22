@@ -56,16 +56,24 @@ def main():
 ###############################################################################
 def scrape_regular_season(year, base_url):
     serialized_games = []
+    # TODO: are there duplicates here??
     active_teams_by_abbr = {abbr: team for abbr, team in teams.teams_by_abbr().items() if team.stint_by_year(year) is not None}
     urls_by_team = {team: f"{base_url}/teams/{team.stint_by_year(year).abbr}/{year}_gamelog.html" for abbr, team in active_teams_by_abbr.items()}
     for team, url in urls_by_team.items():
-      print(f"{stringy_now()}: Scraping {team.stint_by_year(year).abbr} games from {year}", flush=True)
-      game_urls = extract.get_game_urls_from_gamelog(simple_get(url).content, base_url)
-      for game_url in game_urls:
-        print(f"{stringy_now()}: Scraping {game_url}", flush=True)
-        game_html = simple_get(game_url).content
-        (winner, loser, num_penalties) = extract.get_penalties_from_game(game_html, year)
-        serialized_games.append((winner, loser, num_penalties, game_url))
+      if url not in broken_urls():
+        print(f"{stringy_now()}: Scraping {team.stint_by_year(year).abbr} games from {year}", flush=True)
+        game_urls = extract.get_game_urls_from_gamelog(simple_get(url), base_url)
+        for game_url in game_urls:
+          if game_url not in broken_urls():
+            print(f"{stringy_now()}: Scraping {game_url}", flush=True)
+            game_html = simple_get(game_url)
+            (winner, loser, num_penalties) = extract.get_penalties_from_game(game_html, year)
+            serialized_games.append((winner, loser, num_penalties, game_url))
+          else:
+            print(f"{game_url} is broken, skipping...")
+      else:
+        print(f"{url} is broken, skipping...")
+
     # Dedupe.
     return set(serialized_games)
 
@@ -90,17 +98,23 @@ def scrape_playoffs(year, base_url):
   serialized_games = []
   print(f"{stringy_now()}: Scraping playoff games from {year}", flush=True)
   playoff_url = f"{base_url}/playoffs/NHL_{year}.html"
-  playoffs_html = simple_get(playoff_url).content
+  playoffs_html = simple_get(playoff_url)
   series_urls = extract.get_series_urls_from_playoffs_summary(playoffs_html, base_url)
   for series_url in series_urls:
-    print(f"{stringy_now()}: Scraping {series_url}", flush=True)
-    series_html = simple_get(series_url).content
-    game_urls = extract.get_game_urls_from_series(series_html, base_url)
-    for game_url in game_urls:
-      print(f"{stringy_now()}: Scraping {game_url}", flush=True)
-      game_html = simple_get(game_url).content
-      (winner, loser, num_penalties) = extract.get_penalties_from_game(game_html, year)
-      serialized_games.append((winner, loser, num_penalties, game_url))
+    if series_url not in broken_urls():
+      print(f"{stringy_now()}: Scraping {series_url}", flush=True)
+      series_html = simple_get(series_url)
+      game_urls = extract.get_game_urls_from_series(series_html, base_url)
+      for game_url in game_urls:
+        if game_url not in broken_urls():
+          print(f"{stringy_now()}: Scraping {game_url}", flush=True)
+          game_html = simple_get(game_url)
+          (winner, loser, num_penalties) = extract.get_penalties_from_game(game_html, year)
+          serialized_games.append((winner, loser, num_penalties, game_url))
+        else:
+          print(f"{game_Url} is broken, skipping...")
+    else:
+      print(f"{series_url} is broken, skipping...")
   # Dedupe.
   return set(serialized_games)
 
@@ -115,6 +129,7 @@ def scrape_playoffs(year, base_url):
 #   A list of urls of hockey-reference game pages played by that team
 ###############################################################################
 def write_file(serialized_games, filename):
+  # TODO: split by year and team instead of just year
   with open(filename, 'w', newline="") as file:
     writer = csv.writer(file, delimiter=",")
     writer.writerow(["game_id", "winner", "loser", "num_penalties"])
@@ -138,11 +153,19 @@ def simple_get(url):
     response = get(url)
     content_type = response.headers['Content-Type'].lower()
     if (response.status_code == 200 and content_type is not None and content_type.find('html') > -1):
-      return response
+      return response.content
     else:
       print(f"wtf: {response}")
   except RequestException as e:
     print(f"Error during GET to {url}: {str(e)}", flush=True)
+
+def broken_urls():
+  return [
+    "https://www.hockey-reference.com/boxscores/201401070BUF.html",
+    "https://www.hockey-reference.com/boxscores/201401210PHI.html",
+    "https://www.hockey-reference.com/boxscores/201401240CAR.html",
+    "https://www.hockey-reference.com/boxscores/201403100DAL.html"
+  ]
 
 def stringy_now():
   return time.asctime(time.localtime())
