@@ -1,8 +1,8 @@
 from requests import get
 from requests.exceptions import RequestException
-from os import path
 
 import csv
+import os
 import time
 
 import constants
@@ -14,25 +14,32 @@ def main():
   start = time.time()
   base_url = "https://www.hockey-reference.com"
 
-  years = range(constants.FIRST_YEAR, constants.PRESENT_YEAR + 1)
+  years = [year for year in range(constants.FIRST_YEAR, constants.PRESENT_YEAR + 1) if year not in constants.BROKEN_YEARS]
   for year in years:
-    regular_season_serialized_games = []
-    regular_season_filename = f"data/{year}.csv"
-    # This is expensive, so we don't want to do it if we already have the data.
-    if path.isfile(regular_season_filename):
-      print(f"{regular_season_filename} already exists, skipping")
-    else:
-      regular_season_serialized_games = scrape_regular_season(year, base_url)
-      write_file(regular_season_serialized_games, regular_season_filename)
+    # TODO: are there duplicates here??
+    maybe_make_directory(year)
+    active_teams_by_abbr = {abbr: team for abbr, team in teams.teams_by_abbr().items() if team.stint_by_year(year) is not None}
+    for abbr, team in active_teams_by_abbr.items():
+      print(f"{stringy_now()}: Scraping {team.stint_by_year(year).abbr} games from {year}", flush=True)
+      url = f"{base_url}/teams/{team.stint_by_year(year).abbr}/{year}_gamelog.html"
+      (regular_season_urls, playoff_urls) = extract.get_game_urls_from_gamelog(simple_get(url), base_url)
 
-    playoff_serialized_games = []
-    playoff_filename = f"data/{year}_playoffs.csv"
-    # Still expensive when there's less games
-    if path.isfile(playoff_filename):
-      print(f"{playoff_filename} already exists, skipping")
-    else:
-      playoff_serialized_games = scrape_playoffs(year, base_url)
-      write_file(playoff_serialized_games, playoff_filename)
+      regular_season_filename = f"data/{year}/{abbr}.csv"
+      # This is expensive, so we don't want to do it if we already have the data.
+      if os.path.isfile(regular_season_filename):
+        print(f"{regular_season_filename} already exists, skipping")
+      else:
+        regular_season_serialized_games = scrape(regular_season_urls)
+        write_file(regular_season_serialized_games, regular_season_filename)
+
+      playoff_filename = f"data/{year}/{abbr}_playoffs.csv"
+      if os.path.isfile(playoff_filename):
+        print(f"{playoff_filename} already exists, skipping")
+      elif len(playoff_urls) == 0:
+        print(f"{abbr} missed the playoffs in {year}, skipping")
+      else:
+        playoff_serialized_games = scrape(playoff_urls)
+        write_file(playoff_serialized_games, playoff_filename)
 
   end = time.time()
   print(f"Total time: {end-start}", flush=True)
@@ -40,10 +47,9 @@ def main():
 ###############################################################################
 # scrape_regular_season
 #
-# Scrapes hockey-reference for regular season game data for a given year.
+# Scrapes a list of hockey-reference game urls for game data 
 #
 # Inputs:
-#   year: The year for which to get regular season data.
 #   base_url: The url of the scraped website because for SOME REASON these
 #             hrefs are relative
 #
@@ -54,69 +60,19 @@ def main():
 #     loser: the team that lost the game
 #     num_penalties: the number of roughing/fighting penalties
 ###############################################################################
-def scrape_regular_season(year, base_url):
+def scrape(urls):
     serialized_games = []
-    # TODO: are there duplicates here??
-    active_teams_by_abbr = {abbr: team for abbr, team in teams.teams_by_abbr().items() if team.stint_by_year(year) is not None}
-    urls_by_team = {team: f"{base_url}/teams/{team.stint_by_year(year).abbr}/{year}_gamelog.html" for abbr, team in active_teams_by_abbr.items()}
-    for team, url in urls_by_team.items():
+    for url in urls:
       if url not in broken_urls():
-        print(f"{stringy_now()}: Scraping {team.stint_by_year(year).abbr} games from {year}", flush=True)
-        game_urls = extract.get_game_urls_from_gamelog(simple_get(url), base_url)
-        for game_url in game_urls:
-          if game_url not in broken_urls():
-            print(f"{stringy_now()}: Scraping {game_url}", flush=True)
-            game_html = simple_get(game_url)
-            (winner, loser, num_penalties) = extract.get_penalties_from_game(game_html, year)
-            serialized_games.append((winner, loser, num_penalties, game_url))
-          else:
-            print(f"{game_url} is broken, skipping...")
+        print(f"{stringy_now()}: Scraping {url}", flush=True)
+        game_html = simple_get(url)
+        (winner, loser, num_penalties) = extract.get_penalties_from_game(game_html)
+        serialized_games.append((winner, loser, num_penalties, url))
       else:
         print(f"{url} is broken, skipping...")
 
     # Dedupe.
     return set(serialized_games)
-
-###############################################################################
-# scrape_playoffs
-#
-# Scrapes hockey-reference for playoff game data for a given year
-#
-# Inputs:
-#   year: The year for which to get playoff data
-#   base_url: The url of the scraped website because for SOME REASON these
-#             hrefs are relative
-#
-# Outputs:
-#   A list of lists of:
-#     game_id: timestamp (YYYYMMDD) + 0 + home team, e.g. 201902230PHI
-#     winner: the team that won the game
-#     loser: the team that lost the game
-#     num_penalties: the number of roughing/fighting penalties
-###############################################################################
-def scrape_playoffs(year, base_url):
-  serialized_games = []
-  print(f"{stringy_now()}: Scraping playoff games from {year}", flush=True)
-  playoff_url = f"{base_url}/playoffs/NHL_{year}.html"
-  playoffs_html = simple_get(playoff_url)
-  series_urls = extract.get_series_urls_from_playoffs_summary(playoffs_html, base_url)
-  for series_url in series_urls:
-    if series_url not in broken_urls():
-      print(f"{stringy_now()}: Scraping {series_url}", flush=True)
-      series_html = simple_get(series_url)
-      game_urls = extract.get_game_urls_from_series(series_html, base_url)
-      for game_url in game_urls:
-        if game_url not in broken_urls():
-          print(f"{stringy_now()}: Scraping {game_url}", flush=True)
-          game_html = simple_get(game_url)
-          (winner, loser, num_penalties) = extract.get_penalties_from_game(game_html, year)
-          serialized_games.append((winner, loser, num_penalties, game_url))
-        else:
-          print(f"{game_Url} is broken, skipping...")
-    else:
-      print(f"{series_url} is broken, skipping...")
-  # Dedupe.
-  return set(serialized_games)
 
 ###############################################################################
 # write_file
@@ -136,6 +92,10 @@ def write_file(serialized_games, filename):
     for (winner, loser, num_penalties, game_url) in serialized_games:
       game_id = game_url.split("/")[-1].split(".")[0]
       writer.writerow([game_id,winner,loser,num_penalties])
+
+def maybe_make_directory(year):
+  if(not os.path.exists(f"data/{year}")):
+    os.mkdir(f"data/{year}")
 
 ###############################################################################
 # simple_get
@@ -161,11 +121,12 @@ def simple_get(url):
 
 def broken_urls():
   return [
-    "https://www.hockey-reference.com/boxscores/201401070BUF.html",
-    "https://www.hockey-reference.com/boxscores/201401210PHI.html",
-    "https://www.hockey-reference.com/boxscores/201401240CAR.html",
-    "https://www.hockey-reference.com/boxscores/201403100DAL.html"
+    "https://www.hockey-reference.com/boxscores/201401070BUF.html", # Postponed for blizzard
+    "https://www.hockey-reference.com/boxscores/201401210PHI.html", # Postponed for blizzard
+    "https://www.hockey-reference.com/boxscores/201401240CAR.html", # Postponed for blizzard make-up game
+    "https://www.hockey-reference.com/boxscores/201403100DAL.html"  # Rick Peverley medical emergency
   ]
+
 
 def stringy_now():
   return time.asctime(time.localtime())

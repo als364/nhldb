@@ -9,13 +9,12 @@ import teams
 #
 # Inputs:
 #   html: A string of raw html, scraped from a hockey-reference game page
-#   year: The year in which the game took place.
 #
 # Outputs:
 #   A tuple of winner, loser, and number_of_fighting_penalties, where
 #   'fighting' encompasses both fighting and roughing penalties.
 ###############################################################################
-def get_penalties_from_game(html, year):
+def get_penalties_from_game(html):
   soup = BeautifulSoup(html, "html.parser")
 
   scorebox = soup.find(class_="scorebox")
@@ -48,16 +47,24 @@ def get_penalties_from_game(html, year):
 #             hrefs are relative
 #
 # Outputs:
-#   A list of urls of hockey-reference game pages played by that team
+#   A tuple of list of urls of hockey-reference game pages played by that team
+#   - (regular season urls, playoff urls)
 ###############################################################################
 def get_game_urls_from_gamelog(html, base_url):
   soup = BeautifulSoup(html, "html.parser")
 
-  gamelog = soup.find(id="tm_gamelog_rs")
-  game_rows = gamelog.find_all(id=re.compile("tm_gamelog_rs."))
-  link_containers = [game_row.find(attrs={"data-stat": "date_game"}) for game_row in game_rows]
-  links = [base_url + link_container.find("a").get("href") for link_container in link_containers]
-  return links
+  regular_season_gamelog = soup.find(id="tm_gamelog_rs")
+  regular_season_game_rows = regular_season_gamelog.find_all(id=re.compile("tm_gamelog_rs."))
+  regular_season_link_containers = [game_row.find(attrs={"data-stat": "date_game"}) for game_row in regular_season_game_rows]
+  regular_season_links = [base_url + link_container.find("a").get("href") for link_container in regular_season_link_containers]
+
+  playoff_links = []
+  playoff_gamelog = soup.find(id="tm_gamelog_po")
+  if playoff_gamelog is not None:
+    playoff_game_rows = playoff_gamelog.find_all(id=re.compile("tm_gamelog_po."))
+    playoff_link_containers = [game_row.find(attrs={"data-stat": "date_game"}) for game_row in playoff_game_rows]
+    playoff_links = [base_url + link_container.find("a").get("href") for link_container in playoff_link_containers]
+  return (regular_season_links, playoff_links)
 
 ###############################################################################
 # get_series_urls_from_playoffs_summary

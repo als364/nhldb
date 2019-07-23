@@ -1,4 +1,5 @@
 import argparse
+import os
 
 import constants
 import teams
@@ -7,13 +8,14 @@ def main():
   args = parse()
   teams = args.teams
 
-  years = range(constants.FIRST_YEAR, constants.PRESENT_YEAR + 1)
   games = []
+  years = [year for year in range(constants.FIRST_YEAR, constants.PRESENT_YEAR + 1) if year not in constants.BROKEN_YEARS]
   for year in years:
-    with open(f"data/{year}.csv") as file:
+    with open(f"data/{year}/{teams[0]}.csv") as file:
       games.extend(munge(teams, file.readlines()))
-    if args.include_playoffs:
-      with open(f"data/{year}_playoffs.csv") as file:
+    playoff_filename = f"data/{year}/{teams[0]}_playoffs.csv"
+    if args.include_playoffs and os.path.isfile(playoff_filename):
+      with open(playoff_filename) as file:
         games.extend(munge(teams, file.readlines()))
 
   p_win_fight = calc_win_given_fight(games, teams[0])
