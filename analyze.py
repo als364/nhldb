@@ -1,27 +1,42 @@
 import argparse
 import os
 
+from functools import reduce
+
 import constants
 import teams
 
 def main():
   args = parse()
-  teams = args.teams
+  team = args.team
+  other_teams = args.other_teams
 
-  games = []
+  games = {abbr: [] for abbr in other_teams}
   years = [year for year in range(constants.FIRST_YEAR, constants.PRESENT_YEAR + 1) if year not in constants.BROKEN_YEARS]
   for year in years:
-    with open(f"data/{year}/{teams[0]}.csv") as file:
-      games.extend(munge(teams, file.readlines()))
-    playoff_filename = f"data/{year}/{teams[0]}_playoffs.csv"
+    with open(f"data/{year}/{team}.csv") as file:
+      regular_season_games = munge(team, other_teams, file.readlines())
+      games = merge(games, regular_season_games)
+    playoff_filename = f"data/{year}/{team}_playoffs.csv"
     if args.include_playoffs and os.path.isfile(playoff_filename):
       with open(playoff_filename) as file:
-        games.extend(munge(teams, file.readlines()))
-
-  p_win_fight = calc_win_given_fight(games, teams[0])
-  print(f"The conditional probability of {teams[0]} winning a game with a fight is {p_win_fight}")
-  p_win_no_fight = calc_win_given_no_fight(games, teams[0])
-  print(f"The conditional probability of {teams[0]} winning a game without a fight is {p_win_no_fight}")
+        playoff_games = munge(team, other_teams, file.readlines())
+        games = games.merge(games, regular_season_games)
+        
+  if len(other_teams) > 0:
+    for other_team in other_teams:
+      p_win_fight = calc_win_given_fight(games[other_team], team)
+      print(f"The conditional probability of {team} winning a {other_team} game with a fight is {p_win_fight}")
+      p_win_no_fight = calc_win_given_no_fight(games[other_team], team)
+      print(f"The conditional probability of {team} winning a {other_team} game without a fight is {p_win_no_fight}")
+  else:
+    all_games = []
+    for abbr, games_list in games.items():
+      all_games.extend(games_list)
+    p_win_fight = calc_win_given_fight(all_games, team)
+    print(f"The conditional probability of {team} winning a game with a fight is {p_win_fight}")
+    p_win_no_fight = calc_win_given_no_fight(all_games, team)
+    print(f"The conditional probability of {team} winning a game without a fight is {p_win_no_fight}")
 
 ###############################################################################
 # munge
@@ -29,16 +44,20 @@ def main():
 # Munges data from a csv with game data into a data structure.
 #
 # Inputs:
-#   teams: A tuple of team abbrs to pull data for.
+#   team: The abbr of the team we're calculating win probablity for.
+#   other_teams: A list of teams to compare against.
 #   csvlines: A list of serialized game data.
 #
 # Outputs:
-#   A list of maps of games played between the two teams.
+#   A dict of lists of dicts of other team abbr to games played between the
+#   teams.
 ###############################################################################
-def munge(teams, csvlines):
+def munge(team, other_teams, csvlines):
   year_games = [line.split(",") for line in csvlines]
-  team_games = [year_game for year_game in year_games if year_game[1] in teams and year_game[2] in teams]
-  games = []
+  team_games = [year_game for year_game in year_games if year_game[1] == team or year_game[2] == team]
+  if len(other_teams) > 0:
+    team_games = [team_game for team_game in team_games if team_game[1] in other_teams or team_game[2] in other_teams]
+  games = {abbr: [] for abbr in other_teams}
   for team_game in team_games:
     team_game_map = {
       "game_id": team_game[0],
@@ -46,7 +65,37 @@ def munge(teams, csvlines):
       "loser": team_game[2],
       "num_penalties": int(team_game[3])
     }
-    games.append(team_game_map)
+    if team_game_map["winner"] == team:
+      if team_game_map["loser"] in games:
+        games[team_game_map["loser"]].append(team_game_map)
+      else:
+        games[team_game_map["loser"]] = [team_game_map]
+    else:
+      if team_game_map["winner"] in games:
+        games[team_game_map["winner"]].append(team_game_map)
+      else:
+        games[team_game_map["winner"]] = [team_game_map]
+  return games
+
+###############################################################################
+# merge
+#
+# Munges data from a csv with game data into a data structure.
+#
+# Inputs:
+#   games: A dict of lists of dicts of games
+#   new_games: A dict of lists of dicts of games to merge into the first dict
+#
+# Outputs:
+#   A dict consisting of all the values of new_games appended onto all the
+#   values of games.
+###############################################################################
+def merge(games, new_games):
+  for abbr, new_games_list in new_games.items():
+    if abbr in games:
+      games[abbr].extend(new_games_list)
+    else:
+      games[abbr] = new_games_list
   return games
 
 ###############################################################################
@@ -87,14 +136,23 @@ def calc_win_given_no_fight(games, winner):
 
 def parse():
   parser = argparse.ArgumentParser(description="Gets the conditional probability"
-    + "of one team winning against another team with and without a fight"
-    + "in the game")
+    + "of a team or teams (head-to-head) winning games with or without a fight")
   parser.add_argument(
-    "teams",
-    metavar="T",
+    "-t",
+    "--team",
     choices=teams.teams_by_abbr().keys(),
-    nargs=2,
-    help="The three-letter abbreviations of the two teams to compare"
+    help="The three-letter abbreviation of a team to compare",
+    required=True
+  )
+  parser.add_argument(
+    "-o",
+    "--other-teams",
+    choices=teams.teams_by_abbr().keys(),
+    nargs='*',
+    help="The three-letter abbreviations of one or more teams to compare " +
+      "against. If none are provided, all games by the first team will be " +
+      "analyzed.",
+    default=[]
   )
   parser.add_argument(
     "-i",
