@@ -12,7 +12,7 @@ def main():
   other_teams = args.other_teams
 
   games = {abbr: [] for abbr in other_teams}
-  years = [year for year in range(constants.FIRST_YEAR, constants.PRESENT_YEAR + 1) if year not in constants.BROKEN_YEARS]
+  years = [year for year in range(2015, constants.PRESENT_YEAR + 1) if year not in constants.BROKEN_YEARS]
   for year in years:
     with open(f"data/{year}/{team}.csv") as file:
       regular_season_games = munge(team, other_teams, file.readlines())

@@ -10,6 +10,10 @@ import extract
 import teams
 
 def main():
+  url="https://www.hockey-reference.com/boxscores/201901310BOS.html"
+  print(extract.get_penalties_from_game(simple_get(url)))
+
+def scrape():
   print(f"{stringy_now()}: Started scraping", flush=True)
   start = time.time()
   base_url = "https://www.hockey-reference.com"
@@ -66,7 +70,7 @@ def scrape(urls):
       if url not in broken_urls():
         print(f"{stringy_now()}: Scraping {url}", flush=True)
         game_html = simple_get(url)
-        (winner, loser, num_penalties) = extract.get_penalties_from_game(game_html)
+        (winner, loser, num_penalties) = extract.get_fighting_penalties_from_game(game_html)
         serialized_games.append((winner, loser, num_penalties, url))
       else:
         print(f"{url} is broken, skipping...")
