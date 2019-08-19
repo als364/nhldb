@@ -1,11 +1,12 @@
 class Team:
-  def __init__(self, abbr, name, stints):
+  def __init__(self, abbr, name, start, previous):
     self.abbr = abbr
     self.name = name
-    self.stints = stints
+    self.start = start
+    self.previous = previous
 
   def stint_by_year(self, year):
-    for stint in self.stints:
+    for stint in self.previous:
       if stint.start <= year and stint.end >= year:
         return stint
 
