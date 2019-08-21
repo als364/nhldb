@@ -26,6 +26,11 @@
 
 .team {
   text-align: center;
+  cursor: pointer;
+
+  &.selected {
+    background-color: lightgray;
+  }
 }
 
 .submit-button {
@@ -36,6 +41,8 @@
     font-size: 1em;
     // APPARENTLY i need to specify this again or else the system-ui font will be too !important
     font-family: 'Roboto', sans-serif;
+
+    cursor: pointer;
 
     border: none;
     border-radius: 20px;

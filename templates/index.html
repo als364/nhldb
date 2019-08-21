@@ -2,10 +2,15 @@
 <html>
   <head>
     <title>Hockey Arguing</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
     {% assets "less_all" %}
       <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}" />
     {% endassets %}
-    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
+    {% assets "js_all" %}
+      <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
   </head>
   <body>
     <div class="content">
@@ -26,6 +31,9 @@
       </div>
       <div class="submit-button">
         <button>Calculate!</button>
+      </div>
+      <div class="data">
+        {# Response will go here. #}
       </div>
     </div>
   </body>
