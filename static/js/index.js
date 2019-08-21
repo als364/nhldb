@@ -8,12 +8,14 @@ $(document).ready(function() {
     abbrs = _.map(selected, function(team) {
       return team.innerText
     });
-    console.log(abbrs)
+    includePlayoffs = $("[name='include-playoffs'")[0].checked
+    console.log(includePlayoffs)
     $.ajax("/calculate", {
       method: "POST",
       contentType: 'application/json',
       data: JSON.stringify({
-        "abbrs": abbrs
+        "abbrs": abbrs,
+        "include_playoffs": includePlayoffs
       })
     }).then(
       // done

@@ -17,7 +17,7 @@ def analyze(team, other_teams, include_playoffs=False):
     if include_playoffs and os.path.isfile(playoff_filename):
       with open(playoff_filename) as file:
         playoff_games = munge(team, other_teams, file.readlines())
-        games = games.merge(games, regular_season_games)
+        games = merge(games, regular_season_games)
         
   if len(other_teams) > 0:
     for other_team in other_teams:

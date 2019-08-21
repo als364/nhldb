@@ -35,12 +35,14 @@ def serve():
 
 @app.route("/calculate", methods=["POST"])
 def calculate():
-  abbrs = request.get_json()["abbrs"]
+  json = request.get_json()
+  abbrs = json["abbrs"]
+  include_playoffs = json["include_playoffs"]
   data = {abbr: {} for abbr in abbrs}
   for abbr in abbrs:
     other_abbrs = [other_abbr for other_abbr in abbrs if other_abbr != abbr]
     # us vs the world
-    collective = analyze.analyze(abbr, other_abbrs)
+    collective = analyze.analyze(abbr, other_abbrs, include_playoffs)
     data[abbr] = {"collective": collective}
     individuals = {}
     # us vs everyone else individually

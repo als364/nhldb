@@ -29,8 +29,15 @@
           </span>
         {% endfor %}
       </div>
-      <div class="submit-button">
-        <button>Calculate!</button>
+      <div class="flex">
+        <span class="spacer"></span>
+        <span>
+          <input type="checkbox" name="include-playoffs" value="include-playoffs" checked> Include playoffs
+        </span>
+        <span class="submit-button">
+          <button>Calculate!</button>
+        </span>
+        <span class="spacer"></span>
       </div>
       <div class="data">
         {# Response will go here. #}
