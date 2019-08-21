@@ -47,6 +47,10 @@ def calculate():
     for other_abbr in other_abbrs:
       individuals[other_abbr] = analyze.analyze(abbr, [other_abbr])
     data[abbr]["individuals"] = individuals
+    if len(other_abbrs) > 0:
+      data[abbr]["other_abbrs"] = other_abbrs
+    else:
+      data[abbr]["other_abbrs"] = ["all other teams"]
   return render_template(
     "data.html",
     data_by_abbr=data

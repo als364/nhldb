@@ -18,8 +18,7 @@ $(document).ready(function() {
     }).then(
       // done
       function(response) {
-        // $(".data").html(reponse)
-        console.log(response)
+        $(".data").html(response)
       }
       // TODO: failed
     );

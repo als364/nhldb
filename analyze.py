@@ -109,7 +109,7 @@ def merge(games, new_games):
 def calc_win(games, winner):
   count = len(games)
   games_with_win = len([game for game in games if game["winner"] == winner])
-  return games_with_win / count
+  return round((games_with_win / count) * 100, 2)
 
 ###############################################################################
 # calc_win_given_fight
@@ -127,7 +127,7 @@ def calc_win_given_fight(games, winner):
   games_with_win_and_fight = len([game for game in games if game["winner"] == winner and game["num_penalties"] > 0])
   p_win_and_fight = games_with_win_and_fight / count
   p_fight = games_with_fight / count
-  return p_win_and_fight / p_fight
+  return round((p_win_and_fight / p_fight) * 100, 2)
 
 ###############################################################################
 # calc_win_given_no_fight
@@ -145,7 +145,7 @@ def calc_win_given_no_fight(games, winner):
   games_without_win_and_fight = len([game for game in games if game["winner"] == winner and game["num_penalties"] == 0])
   p_win_and_fight = games_without_win_and_fight / count
   p_fight = games_without_fight / count
-  return p_win_and_fight / p_fight
+  return round((p_win_and_fight / p_fight) * 100, 2)
 
 ###############################################################################
 if __name__ == "__main__":

@@ -1,10 +1,30 @@
 {% for abbr, data in data_by_abbr.items() %}
-  
   {# Collective #}
   <div class="collective">
-    The probability of 
+    <div class="win">
+      {{ abbr }} wins {{ data["collective"]["win"] }}% of their games against {{ data["other_abbrs"]|join(", ") }}
+    </div>
+    <div class="fight">
+      {{ abbr }} wins {{ data["collective"]["fight"] }}% of their games against {{ data["other_abbrs"]|join(", ") }} when there is a fight during the game
+    </div>
+    <div class="no_fight">
+      {{ abbr }} wins {{ data["collective"]["no_fight"] }}% of their games against {{ data["other_abbrs"]|join(", ") }} when there is no fight during the game
+    </div>
   </div>
   {# Individual #}
-  {% for  %}
-  {% endfor %}
+  {% if other_teams|length > 1 %}
+    <div class="individual">
+      {% for other_abbr, individual in data["individual"].items() %}
+        <div class="win">
+          {{ abbr }} wins {{ data["collective"]["win"] }}% of their games against {{ other_abbr }}
+        </div>
+        <div class="fight">
+          {{ abbr }} wins {{ data["collective"]["fight"] }}% of their games against {{ other_abbr }} when there is a fight during the game
+        </div>
+        <div class="no_fight">
+          {{ abbr }} wins {{ data["collective"]["no_fight"] }}% of their games against {{ other_abbr }} when there is no fight during the game
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
 {% endfor %}
