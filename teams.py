@@ -1,13 +1,13 @@
-import csv
+import json
 
 import constants
 from team import Team
 from team_stint import Team_Stint
 
 ###############################################################################
-# extract_data_from_csv
+# extract
 #
-# Recursively munges data from a csv with team data into a data structure.
+# Recursively munges data from a json with team data into a data structure.
 #
 # Inputs:
 #   path: The path for the file.
@@ -17,37 +17,55 @@ from team_stint import Team_Stint
 #   Team's in the map contain all Team_Stint's in their history; defunct Team's
 #   contain all Team_Stint's prior to their relocation or renaming.
 ###############################################################################
-def extract_data_from_csv(path):
+def extract(path):
   with open(path) as file:
-    reader = csv.DictReader(file, delimiter=",")
-    team_stints = [
-      Team_Stint(
-        stint["abbr"],
-        stint["name"],
-        int(stint["start"]),
-        constants.PRESENT_YEAR if stint["end"] == constants.PRESENT_STRING else int(stint["end"]),
-        None if stint["next"] == "" else stint["next"],
-        None if stint["prev"] == "" else stint["prev"]
+    teams_json = json.load(file)
+    teams = {}
+    for team_json in teams_json:
+      abbr = team_json["abbr"]
+      teams[abbr] = Team(
+        abbr,
+        team_json["name"],
+        team_json["start"],
+        team_json["conference"],
+        team_json["division"],
+        []
       )
-      for stint in reader
-    ]
-    teams = {stint.abbr: Team(stint.abbr, stint.name, [stint]) for stint in team_stints if stint.next_abbr is None}
-    defunct_teams = [stint for stint in team_stints if stint.next_abbr is not None]
-    return _extract_data_from_csv(teams, defunct_teams)
+      if "previous" in team_json:
+        previous_json = team_json["previous"]
+        for previous_stint in previous_json:
+          stint = Team_Stint(
+            previous_stint["abbr"],
+            previous_stint["name"],
+            previous_stint["start"],
+            previous_stint["end"]
+          )
+          teams[abbr].previous.append(stint)
 
-def _extract_data_from_csv(teams, stints):
-  if len(stints) is 0:
+    return teams
+
+def _include_defunct(teams, defunct_teams, include_defunct):
+  if len(defunct_teams) is 0:
     return teams
   else:
-    for stint in stints:
+    for stint in defunct_teams.values():
       if stint.next_abbr in teams:
         teams[stint.next_abbr].stints.append(stint)
       teams[stint.abbr] = Team(stint.abbr, stint.name, [stint])
     remaining_stints = [stint for stint in stints if stint.abbr not in teams.keys()]
-    return _extract_data_from_csv(teams, remaining_stints)
+    return _extract(teams, remaining_stints)
+
+def _collapse_defunct_teams(stints):
+  remaining_stints = [stint for stint in stints if stint.next_abbr in stints.key()]
+  if len(remaining_stints) == 0:
+    return stints
+  for abbr, stint in stints.items():
+    if stint.next_abbr in stints.keys():
+      stints[stint.next_abbr].stints.append(stint)
+  return collapse_defunct_teams(stints)
 
 # Lazy static eval
-present_teams = extract_data_from_csv("data/stints.csv")
+teams = extract("data/teams.json")
 
 def teams_by_abbr():
-  return present_teams
+  return teams

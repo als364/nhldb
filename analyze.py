@@ -6,11 +6,7 @@ from functools import reduce
 import constants
 import teams
 
-def main():
-  args = parse()
-  team = args.team
-  other_teams = args.other_teams
-
+def analyze(team, other_teams, include_playoffs=False):
   games = {abbr: [] for abbr in other_teams}
   years = [year for year in range(constants.FIRST_YEAR, constants.PRESENT_YEAR + 1) if year not in constants.BROKEN_YEARS]
   for year in years:
@@ -18,25 +14,27 @@ def main():
       regular_season_games = munge(team, other_teams, file.readlines())
       games = merge(games, regular_season_games)
     playoff_filename = f"data/{year}/{team}_playoffs.csv"
-    if args.include_playoffs and os.path.isfile(playoff_filename):
+    if include_playoffs and os.path.isfile(playoff_filename):
       with open(playoff_filename) as file:
         playoff_games = munge(team, other_teams, file.readlines())
-        games = games.merge(games, regular_season_games)
+        games = merge(games, regular_season_games)
         
   if len(other_teams) > 0:
     for other_team in other_teams:
-      p_win_fight = calc_win_given_fight(games[other_team], team)
-      print(f"The conditional probability of {team} winning a {other_team} game with a fight is {p_win_fight}")
-      p_win_no_fight = calc_win_given_no_fight(games[other_team], team)
-      print(f"The conditional probability of {team} winning a {other_team} game without a fight is {p_win_no_fight}")
+      return({
+        "win": calc_win(games[other_team], team),
+        "fight": calc_win_given_fight(games[other_team], team),
+        "no_fight": calc_win_given_no_fight(games[other_team], team)
+      })
   else:
     all_games = []
     for abbr, games_list in games.items():
       all_games.extend(games_list)
-    p_win_fight = calc_win_given_fight(all_games, team)
-    print(f"The conditional probability of {team} winning a game with a fight is {p_win_fight}")
-    p_win_no_fight = calc_win_given_no_fight(all_games, team)
-    print(f"The conditional probability of {team} winning a game without a fight is {p_win_no_fight}")
+    return({
+      "win": calc_win(all_games, team),
+      "fight": calc_win_given_fight(all_games, team),
+      "no_fight": calc_win_given_no_fight(all_games, team)
+    })
 
 ###############################################################################
 # munge
@@ -99,6 +97,21 @@ def merge(games, new_games):
   return games
 
 ###############################################################################
+# calc_win
+#
+# Inputs:
+#   games: A list of game data maps.
+#   winner: The team for which to calculate P(win).
+#
+# Outputs:
+#   The probability that the winner wins a game
+###############################################################################
+def calc_win(games, winner):
+  count = len(games)
+  games_with_win = len([game for game in games if game["winner"] == winner])
+  return round((games_with_win / count) * 100, 2)
+
+###############################################################################
 # calc_win_given_fight
 #
 # Inputs:
@@ -114,7 +127,7 @@ def calc_win_given_fight(games, winner):
   games_with_win_and_fight = len([game for game in games if game["winner"] == winner and game["num_penalties"] > 0])
   p_win_and_fight = games_with_win_and_fight / count
   p_fight = games_with_fight / count
-  return p_win_and_fight / p_fight
+  return round((p_win_and_fight / p_fight) * 100, 2)
 
 ###############################################################################
 # calc_win_given_no_fight
@@ -132,36 +145,7 @@ def calc_win_given_no_fight(games, winner):
   games_without_win_and_fight = len([game for game in games if game["winner"] == winner and game["num_penalties"] == 0])
   p_win_and_fight = games_without_win_and_fight / count
   p_fight = games_without_fight / count
-  return p_win_and_fight / p_fight
-
-def parse():
-  parser = argparse.ArgumentParser(description="Gets the conditional probability"
-    + "of a team or teams (head-to-head) winning games with or without a fight")
-  parser.add_argument(
-    "-t",
-    "--team",
-    choices=teams.teams_by_abbr().keys(),
-    help="The three-letter abbreviation of a team to compare",
-    required=True
-  )
-  parser.add_argument(
-    "-o",
-    "--other-teams",
-    choices=teams.teams_by_abbr().keys(),
-    nargs='*',
-    help="The three-letter abbreviations of one or more teams to compare " +
-      "against. If none are provided, all games by the first team will be " +
-      "analyzed.",
-    default=[]
-  )
-  parser.add_argument(
-    "-i",
-    "--include-playoffs",
-    action="store_true",
-    default=False,
-    help="Whether or not to include playoff data. Default: False"
-  )
-  return parser.parse_args()
+  return round((p_win_and_fight / p_fight) * 100, 2)
 
 ###############################################################################
 if __name__ == "__main__":

@@ -1,0 +1,4 @@
+env/
+static/gen/
+static/.webassets-cache/
+__pycache__/
