@@ -14,9 +14,19 @@ assets.register("less_all", less)
 
 @app.route("/")
 def hello():
+  teams_by_abbr = teams.teams_by_abbr()
+  teams_by_division = {
+    "Pacific": [],
+    "Central": [],
+    "Metropolitan": [],
+    "Atlantic": []
+  }
+  for abbr, team in teams_by_abbr.items():
+    teams_by_division[team.division].append(team)
+
   return render_template(
     'index.html',
-    teams=teams.teams_by_abbr().keys()
+    teams_by_division=teams_by_division
   )
 
 if __name__ == "__main__":

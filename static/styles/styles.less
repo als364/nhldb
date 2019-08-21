@@ -1,14 +1,11 @@
 .content {
   width: 60%;
   margin: auto;
+  font-family: 'Roboto', sans-serif;
 }
 
 .center {
   text-align: center;
-}
-
-.spacer-small {
-  height: 10px;
 }
 
 .flex {
@@ -16,7 +13,32 @@
   flex-wrap: wrap;
 
   span {
-    width: 4%;
-    padding: 0px 10px;
+    width: 25%;
+  }
+
+  margin: 20px 0px;
+}
+
+.division {
+  text-align: center;
+  font-weight: bold;
+}
+
+.team {
+  text-align: center;
+}
+
+.submit-button {
+  button {
+    display: block;
+    margin: auto;
+
+    font-size: 1em;
+    // APPARENTLY i need to specify this again or else the system-ui font will be too !important
+    font-family: 'Roboto', sans-serif;
+
+    border: none;
+    border-radius: 20px;
+    background-color: lightgray;
   }
 }

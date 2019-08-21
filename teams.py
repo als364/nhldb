@@ -27,6 +27,8 @@ def extract(path):
         abbr,
         team_json["name"],
         team_json["start"],
+        team_json["conference"],
+        team_json["division"],
         []
       )
       if "previous" in team_json:

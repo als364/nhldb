@@ -1,8 +1,10 @@
 class Team:
-  def __init__(self, abbr, name, start, previous):
+  def __init__(self, abbr, name, start, conference, division, previous):
     self.abbr = abbr
     self.name = name
     self.start = start
+    self.conference = conference
+    self.division = division
     self.previous = previous
 
   def stint_by_year(self, year):
