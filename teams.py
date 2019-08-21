@@ -20,17 +20,6 @@ from team_stint import Team_Stint
 def extract(path):
   with open(path) as file:
     teams_json = json.load(file)
-    # team_stints = [
-    #   Team_Stint(
-    #     stint["abbr"],
-    #     stint["name"],
-    #     int(stint["start"]),
-    #     constants.PRESENT_YEAR if stint["end"] == constants.PRESENT_STRING else int(stint["end"]),
-    #     None if stint["next"] == "" else stint["next"],
-    #     None if stint["prev"] == "" else stint["prev"]
-    #   )
-    #   for stint in reader
-    # ]
     teams = {}
     for team_json in teams_json:
       abbr = team_json["abbr"]
