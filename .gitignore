@@ -1,2 +1,4 @@
 env/
-gen/
+static/gen/
+static/.webassets-cache/
+__pycache__/

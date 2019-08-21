@@ -1,0 +1,22 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Hockey Arguing</title>
+    {% assets "less_all" %}
+      <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}" />
+    {% endassets %}
+  </head>
+  <body>
+    <div class="content">
+      <h1 class="center">Penalties vs Wins</h1>
+      <div>Calculates how likely an NHL team is to win a game in which they have a fight vs a game in which they do not have a fight. 'Fight' is defined as any fighting or roughing penalty on either team during the game.</div>
+      <div>The NHL didn't keep track of penalty data before the 1979-1980 season, so data only extends that far. Sorry, Detroit Falcons and Toronto Arenas fans.</div>
+      <div class="spacer-small"></div>
+      <div class="flex">
+        {% for team in teams %}
+          <span value="{{team}}">{{team}}</span>
+        {% endfor %}
+      </div>
+    </div>
+  </body>
+</html>

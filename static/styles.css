@@ -1,0 +1,12 @@
+.center {
+  text-align: center;
+}
+.spacer-small {
+  height: 10px;
+}
+.flex {
+  display: flex;
+}
+.flex span {
+  padding: 0px 10px;
+}
