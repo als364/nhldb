@@ -7,17 +7,26 @@ class Team:
     self.division = division
     self.previous = previous
 
-  def stint_by_year(self, year):
-    for stint in self.previous:
-      if stint.start <= year and stint.end >= year:
-        return stint
+  def data_by_year(self, year):
+    if year > self.start:
+      return {
+        "abbr": self.abbr,
+        "name": self.name
+      }
+    else:
+      for stint in self.previous:
+        if stint.start <= year and stint.end >= year:
+          return {
+            "abbr": stint.abbr,
+            "name": stint.name
+          }
 
   def __str__(self):
-    string = f"{self.name} ({self.abbr}): {self.stints[0].start}-{self.stints[0].end}"
-    if len(self.stints) > 1:
+    string = f"{self.name} ({self.abbr}): {self.start}-present"
+    if len(self.previous) > 0:
       string += " ("
-      for i in range(1, len(self.stints)):
-        string += f"As {self.stints[i].name} ({self.stints[i].abbr}) {self.stints[1].start}-{self.stints[1].end}, "
+      for i in range(1, len(self.previous)):
+        string += f"As {self.previous[i].name} ({self.previous[i].abbr}) {self.previous[1].start}-{self.previous[1].end}, "
       string = string[:-2]
       string += ")"
     return string

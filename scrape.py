@@ -16,12 +16,12 @@ def main():
 
   years = [year for year in range(constants.FIRST_YEAR, constants.PRESENT_YEAR + 1) if year not in constants.BROKEN_YEARS]
   for year in years:
-    # TODO: are there duplicates here??
     maybe_make_directory(year)
-    active_teams_by_abbr = {abbr: team for abbr, team in teams.teams_by_abbr().items() if team.stint_by_year(year) is not None}
+    active_teams_by_abbr = {abbr: team for abbr, team in teams.teams_by_abbr().items() if team.data_by_year(year) is not None}
     for abbr, team in active_teams_by_abbr.items():
-      print(f"{stringy_now()}: Scraping {team.stint_by_year(year).abbr} games from {year}", flush=True)
-      url = f"{base_url}/teams/{team.stint_by_year(year).abbr}/{year}_gamelog.html"
+      data_by_year = team.data_by_year(year)
+      print(f"{stringy_now()}: Scraping {data_by_year['abbr']} games from {year}", flush=True)
+      url = f"{base_url}/teams/{data_by_year['abbr']}/{year}_gamelog.html"
       (regular_season_urls, playoff_urls) = extract.get_game_urls_from_gamelog(simple_get(url), base_url)
 
       regular_season_filename = f"data/{year}/{abbr}.csv"
