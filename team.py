@@ -8,7 +8,7 @@ class Team:
     self.previous = previous
 
   def data_by_year(self, year):
-    if year > self.start:
+    if year >= self.start:
       return {
         "abbr": self.abbr,
         "name": self.name

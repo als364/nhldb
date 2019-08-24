@@ -9,13 +9,14 @@ import teams
 def analyze(team, other_teams, include_playoffs=False):
   games = {abbr: [] for abbr in other_teams}
   years = [year for year in range(constants.FIRST_YEAR, constants.PRESENT_YEAR + 1) if year not in constants.BROKEN_YEARS]
+  parent = os.path.dirname(os.path.abspath(__file__))
   for year in years:
-    with open(f"data/{year}/{team}.csv") as file:
+    with open(os.path.join(parent, f"data/{year}/{team}.csv")) as file:
       regular_season_games = munge(team, other_teams, file.readlines())
       games = merge(games, regular_season_games)
     playoff_filename = f"data/{year}/{team}_playoffs.csv"
-    if include_playoffs and os.path.isfile(playoff_filename):
-      with open(playoff_filename) as file:
+    if include_playoffs and os.path.isfile(os.path.join(parent, playoff_filename)):
+      with open(os.path.join(parent, playoff_filename)) as file:
         playoff_games = munge(team, other_teams, file.readlines())
         games = merge(games, regular_season_games)
         
