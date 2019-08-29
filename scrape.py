@@ -19,27 +19,27 @@ def main():
     maybe_make_directory(year)
     active_teams_by_abbr = {abbr: team for abbr, team in teams.teams_by_abbr().items() if team.data_by_year(year) is not None}
     for abbr, team in active_teams_by_abbr.items():
-      data_by_year = team.data_by_year(year)
-      print(f"{stringy_now()}: Scraping {data_by_year['abbr']} games from {year}", flush=True)
-      url = f"{base_url}/teams/{data_by_year['abbr']}/{year}_gamelog.html"
-      (regular_season_urls, playoff_urls) = extract.get_game_urls_from_gamelog(simple_get(url), base_url)
-
       regular_season_filename = f"data/{year}/{abbr}.csv"
       # This is expensive, so we don't want to do it if we already have the data.
       if os.path.isfile(regular_season_filename):
         print(f"{regular_season_filename} already exists, skipping")
       else:
+        data_by_year = team.data_by_year(year)
+        print(f"{stringy_now()}: Scraping {data_by_year['abbr']} games from {year}", flush=True)
+        url = f"{base_url}/teams/{data_by_year['abbr']}/{year}_gamelog.html"
+        (regular_season_urls, playoff_urls) = extract.get_game_urls_from_gamelog(simple_get(url), base_url)
+
         regular_season_serialized_games = scrape(regular_season_urls)
         write_file(regular_season_serialized_games, regular_season_filename)
 
-      playoff_filename = f"data/{year}/{abbr}_playoffs.csv"
-      if os.path.isfile(playoff_filename):
-        print(f"{playoff_filename} already exists, skipping")
-      elif len(playoff_urls) == 0:
-        print(f"{abbr} missed the playoffs in {year}, skipping")
-      else:
-        playoff_serialized_games = scrape(playoff_urls)
-        write_file(playoff_serialized_games, playoff_filename)
+        playoff_filename = f"data/{year}/{abbr}_playoffs.csv"
+        if os.path.isfile(playoff_filename):
+          print(f"{playoff_filename} already exists, skipping")
+        elif len(playoff_urls) == 0:
+          print(f"{abbr} missed the playoffs in {year}, skipping")
+        else:
+          playoff_serialized_games = scrape(playoff_urls)
+          write_file(playoff_serialized_games, playoff_filename)
 
   end = time.time()
   print(f"Total time: {end-start}", flush=True)
