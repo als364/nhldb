@@ -11,10 +11,56 @@ import teams
 #   html: A string of raw html, scraped from a hockey-reference game page
 #
 # Outputs:
+#   A map of period, time, team, player id, penalty, and penalty length.
+###############################################################################
+def get_penalties_from_game(html):
+  soup = BeautifulSoup(html, "html.parser")
+
+  penalties = soup.find(id="all_penalty")
+  rows = penalties.find_all("tr")
+
+  penalties = []
+  period = ""
+  for row in rows:
+    if row.find("th"):
+      if "OT" in row.find("th").string:
+        period = row.find("th").string[0] + "OT"
+      else:
+        period = row.find("th").string[0]
+    else:
+      cells = row.find_all("td")
+      player_cell = cells[2]
+      # removing '/player/_/', where _ is the first letter of their last name,
+      # and then the ending '.html'.
+      player_id = player_cell.find("a").get("href")[11:-5]
+      penalty_text = cells[3].string
+      duration = cells[4].string
+      # duration = re.sub(f"{duration}..", "", duration)
+      duration = duration[:-4]
+      
+      penalty = {
+        "period": period,
+        "time": cells[0].string,
+        "team": cells[1].string,
+        "player_id": player_id,
+        "penalty": penalty_text,
+        "duration": duration
+      }
+      penalties.append(penalty)
+
+  return penalties
+
+###############################################################################
+# get_fighting_penalties_from_game
+#
+# Inputs:
+#   html: A string of raw html, scraped from a hockey-reference game page
+#
+# Outputs:
 #   A tuple of winner, loser, and number_of_fighting_penalties, where
 #   'fighting' encompasses both fighting and roughing penalties.
 ###############################################################################
-def get_penalties_from_game(html):
+def get_fighting_penalties_from_game(html):
   soup = BeautifulSoup(html, "html.parser")
 
   scorebox = soup.find(class_="scorebox")
