@@ -29,19 +29,13 @@ def get_penalties_from_game(html):
         period = row.find("th").string[0]
     else:
       cells = row.find_all("td")
-      penalty_summary = cells[2]
+      player_cell = cells[2]
       # removing '/player/_/', where _ is the first letter of their last name,
       # and then the ending '.html'.
-      player_id = penalty_summary.find("a").get("href")[11:-5]
-      # ugh. doing .string() doesn't work for mixed tags like this because
-      # BeautifulSoup thinks you're doing HTML wrong, which you are. so we
-      # need to use .contents(), which returns a list of children. here, that's
-      # the player link and then some text. we're getting the text.
-      penalty_text = penalty_summary.contents[1]
-      actual_penalty = penalty_text[2:]
-      actual_penalty = re.sub("..\\d+ min", "", actual_penalty)
-      duration = penalty_text[2:]
-      duration = re.sub(f"{actual_penalty}..", "", duration)
+      player_id = player_cell.find("a").get("href")[11:-5]
+      penalty_text = cells[3].string
+      duration = cells[4].string
+      # duration = re.sub(f"{duration}..", "", duration)
       duration = duration[:-4]
       
       penalty = {
@@ -49,7 +43,7 @@ def get_penalties_from_game(html):
         "time": cells[0].string,
         "team": cells[1].string,
         "player_id": player_id,
-        "penalty": actual_penalty,
+        "penalty": penalty_text,
         "duration": duration
       }
       penalties.append(penalty)

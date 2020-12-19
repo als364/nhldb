@@ -1,6 +1,3 @@
-from requests import get
-from requests.exceptions import RequestException
-
 import csv
 import os
 import time
@@ -8,12 +5,9 @@ import time
 import constants
 import extract
 import teams
+import utils
 
 def main():
-  url="https://www.hockey-reference.com/boxscores/201901310BOS.html"
-  print(extract.get_penalties_from_game(simple_get(url)))
-
-def scrape():
   print(f"{stringy_now()}: Started scraping", flush=True)
   start = time.time()
   base_url = "https://www.hockey-reference.com"
@@ -26,9 +20,9 @@ def scrape():
     for abbr, team in active_teams_by_abbr.items():
       print(f"{stringy_now()}: Scraping {team.stint_by_year(year).abbr} games from {year}", flush=True)
       url = f"{base_url}/teams/{team.stint_by_year(year).abbr}/{year}_gamelog.html"
-      (regular_season_urls, playoff_urls) = extract.get_game_urls_from_gamelog(simple_get(url), base_url)
+      (regular_season_urls, playoff_urls) = extract.get_game_urls_from_gamelog(utils.simple_get(url), base_url)
 
-      regular_season_filename = f"data/{year}/{abbr}.csv"
+      regular_season_filename = f"game_data/{year}/{abbr}.csv"
       # This is expensive, so we don't want to do it if we already have the data.
       if os.path.isfile(regular_season_filename):
         print(f"{regular_season_filename} already exists, skipping")
@@ -36,7 +30,7 @@ def scrape():
         regular_season_serialized_games = scrape(regular_season_urls)
         write_file(regular_season_serialized_games, regular_season_filename)
 
-      playoff_filename = f"data/{year}/{abbr}_playoffs.csv"
+      playoff_filename = f"game_data/{year}/{abbr}_playoffs.csv"
       if os.path.isfile(playoff_filename):
         print(f"{playoff_filename} already exists, skipping")
       elif len(playoff_urls) == 0:
@@ -69,7 +63,7 @@ def scrape(urls):
     for url in urls:
       if url not in broken_urls():
         print(f"{stringy_now()}: Scraping {url}", flush=True)
-        game_html = simple_get(url)
+        game_html = utils.simple_get(url)
         (winner, loser, num_penalties) = extract.get_fighting_penalties_from_game(game_html)
         serialized_games.append((winner, loser, num_penalties, url))
       else:
@@ -98,30 +92,8 @@ def write_file(serialized_games, filename):
       writer.writerow([game_id,winner,loser,num_penalties])
 
 def maybe_make_directory(year):
-  if(not os.path.exists(f"data/{year}")):
-    os.mkdir(f"data/{year}")
-
-###############################################################################
-# simple_get
-#
-# An HTTP GET request with basic error handling.
-#
-# Inputs:
-#   url: The URL to request.
-#
-# Outputs:
-#   The content of the HTTP response.
-###############################################################################
-def simple_get(url):
-  try:
-    response = get(url)
-    content_type = response.headers['Content-Type'].lower()
-    if (response.status_code == 200 and content_type is not None and content_type.find('html') > -1):
-      return response.content
-    else:
-      print(f"wtf: {response}")
-  except RequestException as e:
-    print(f"Error during GET to {url}: {str(e)}", flush=True)
+  if(not os.path.exists(f"game_data/{year}")):
+    os.mkdir(f"game_data/{year}")
 
 def broken_urls():
   return [
