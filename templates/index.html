@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Hockey Arguing</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+    {% assets "less_all" %}
+      <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}" />
+    {% endassets %}
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
+    {% assets "js_all" %}
+      <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+  </head>
+  <body>
+    <div class="content">
+      <h1 class="center">Penalties vs Wins</h1>
+      <div>Calculates how likely an NHL team is to win a game in which they have a fight vs a game in which they do not have a fight.</div>
+      <div>'Fight' is defined as any fighting or roughing penalty on either team during the game.</div>
+      <div>The NHL didn't keep track of penalty data before the 1979-1980 season, so data only extends that far. Sorry, Detroit Falcons and Toronto Arenas fans.</div>
+      <hr/>
+      <div class="flex">
+        {% for division, teams in teams_by_division.items() %}
+          <span value="{{division}}">
+            <div class="division">{{division}}</div>
+            {% for team in teams %}
+              <div class="team">{{team.abbr}}</div>
+            {% endfor %}
+          </span>
+        {% endfor %}
+      </div>
+      <div class="flex">
+        <span class="spacer"></span>
+        <span>
+          <input type="checkbox" name="include-playoffs" value="include-playoffs" checked> Include playoffs
+        </span>
+        <span class="submit-button">
+          <button>Calculate!</button>
+        </span>
+        <span class="spacer"></span>
+      </div>
+      <div class="data">
+        {# Response will go here. #}
+      </div>
+    </div>
+  </body>
+</html>

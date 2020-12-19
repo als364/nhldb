@@ -1,0 +1,283 @@
+[
+  {
+    "abbr": "ANA",
+    "name": "Anaheim Ducks",
+    "conference": "Western",
+    "division": "Pacific",
+    "start": 2007,
+    "previous": [{
+      "abbr": "MDA",
+      "name": "Mighty Ducks of Anaheim",
+      "start": 1994,
+      "end": 2006
+    }]
+  },
+  {
+    "abbr": "ARI",
+    "name": "Arizona Coyotes",
+    "start": 2015,
+    "conference": "Western",
+    "division": "Pacific",
+    "previous": [
+      {
+        "abbr": "PHX",
+        "name": "Phoenix Coyotes",
+        "start": 1997,
+        "end": 2014
+      },
+      {
+        "abbr": "WIN",
+        "name": "Winnipeg Jets",
+        "start": 1980,
+        "end": 1996
+      }
+    ]
+  },
+  {
+    "abbr": "BOS",
+    "name": "Boston Bruins",
+    "conference": "Eastern",
+    "division": "Atlantic",
+    "start": 1925
+  },
+  {
+    "abbr": "BUF",
+    "name": "Buffalo Sabres",
+    "conference": "Eastern",
+    "division": "Atlantic",
+    "start": 1971
+  },
+  {
+    "abbr": "CAR",
+    "name": "Carolina Hurricanes",
+    "conference": "Eastern",
+    "division": "Metropolitan",
+    "start": 1998,
+    "previous": [{
+      "abbr": "HAR",
+      "name": "Hartford Whalers",
+      "start": 1980,
+      "end": 1997
+    }]
+  },
+  {
+    "abbr": "CBJ",
+    "name": "Columbus Blue Jackets",
+    "conference": "Eastern",
+    "division": "Metropolitan",
+    "start": 2001
+  },
+  {
+    "abbr": "CGY",
+    "name": "Calgary Flames",
+    "conference": "Western",
+    "division": "Pacific",
+    "start": 1981,
+    "previous": [{
+      "abbr": "ATF",
+      "name": "Atlanta Flames",
+      "start": 1973,
+      "end": 1980
+    }]
+  },
+  {
+    "abbr": "CHI",
+    "name": "Chicago Blackhawks",
+    "conference": "Western",
+    "division": "Central",
+    "start": 1987,
+    "previous": [
+      {
+        "abbr": "CBH",
+        "name": "Chicago Black Hawks",
+        "start": 1927,
+        "end": 1986
+      }
+    ]
+  },
+  {
+    "abbr": "COL",
+    "name": "Colorado Avalanche",
+    "conference": "Western",
+    "division": "Central",
+    "start": 1996,
+    "previous": [{
+      "abbr": "QUE",
+      "name": "Quebec Nordiques",
+      "start": 1980,
+      "end": 1995
+    }]
+  },
+  {
+    "abbr": "DAL",
+    "name": "Dallas Stars",
+    "conference": "Western",
+    "division": "Central",
+    "start": 1994,
+    "previous": [{
+      "abbr": "MNS",
+      "name": "Minnesota North Stars",
+      "start": 1968,
+      "end": 1993
+    }]
+  },
+  {
+    "abbr": "DET",
+    "name": "Detroit Red Wings",
+    "conference": "Eastern",
+    "division": "Atlantic",
+    "start": 1933
+  },
+  {
+    "abbr": "EDM",
+    "name": "Edmonton Oilers",
+    "conference": "Western",
+    "division": "Pacific",
+    "start": 1980
+  },
+  {
+    "abbr": "FLA",
+    "name": "Florida Panthers",
+    "conference": "Eastern",
+    "division": "Atlantic",
+    "start": 1994
+  },
+  {
+    "abbr": "LAK",
+    "name": "Los Angeles Kings",
+    "conference": "Western",
+    "division": "Pacific",
+    "start": 1968
+  },
+  {
+    "abbr": "MIN",
+    "name": "Minnesota Wild",
+    "conference": "Western",
+    "division": "Central",
+    "start": 2001
+  },
+  {
+    "abbr": "MTL",
+    "name": "Montreal Canadiens",
+    "conference": "Eastern",
+    "division": "Atlantic",
+    "start": 1918
+  },
+  {
+    "abbr": "NJD",
+    "name": "New Jersey Devils",
+    "conference": "Eastern",
+    "division": "Metropolitan",
+    "start": 1983,
+    "previous": [{
+      "abbr": "CLR",
+      "name": "Colorado Rockies",
+      "start": 1977,
+      "end": 1982
+    }]
+  },
+  {
+    "abbr": "NSH",
+    "name": "Nashville Predators",
+    "conference": "Western",
+    "division": "Central",
+    "start": 1999
+  },
+  {
+    "abbr": "NYI",
+    "name": "New York Islanders",
+    "conference": "Eastern",
+    "division": "Metropolitan",
+    "start": 1973
+  },
+  {
+    "abbr": "NYR",
+    "name": "New York Rangers",
+    "conference": "Eastern",
+    "division": "Metropolitan",
+    "start": 1927
+  },
+  {
+    "abbr": "OTT",
+    "name": "Ottawa Senators",
+    "conference": "Eastern",
+    "division": "Atlantic",
+    "start": 1993
+  },
+  {
+    "abbr": "PHI",
+    "name": "Philadelphia Flyers",
+    "conference": "Eastern",
+    "division": "Metropolitan",
+    "start": 1968
+  },
+  {
+    "abbr": "PIT",
+    "name": "Pittsburgh Penguins",
+    "conference": "Eastern",
+    "division": "Metropolitan",
+    "start": 1968
+  },
+  {
+    "abbr": "SJS",
+    "name": "San Jose Sharks",
+    "conference": "Western",
+    "division": "Pacific",
+    "start": 1992
+  },
+  {
+    "abbr": "STL",
+    "name": "St. Louis Blues",
+    "conference": "Western",
+    "division": "Central",
+    "start": 1968
+  },
+  {
+    "abbr": "TBL",
+    "name": "Tampa Bay Lightning",
+    "conference": "Eastern",
+    "division": "Atlantic",
+    "start": 1993
+  },
+  {
+    "abbr": "TOR",
+    "name": "Toronto Maple Leafs",
+    "conference": "Eastern",
+    "division": "Atlantic",
+    "start": 1927
+  },
+  {
+    "abbr": "VAN",
+    "name": "Vancouver Canucks",
+    "conference": "Western",
+    "division": "Pacific",
+    "start": 1971
+  },
+  {
+    "abbr": "VEG",
+    "name": "Vegas Golden Knights",
+    "conference": "Western",
+    "division": "Pacific",
+    "start": 2018
+  },
+  {
+    "abbr": "WPG",
+    "name": "Winnipeg Jets",
+    "conference": "Western",
+    "division": "Central",
+    "start": 2012,
+    "previous": [{
+      "abbr": "ATL",
+      "name": "Atlanta Thrashers",
+      "start": 2000,
+      "end": 2011
+    }]
+  },
+  {
+    "abbr": "WSH",
+    "name": "Washington Capitals",
+    "conference": "Eastern",
+    "division": "Metropolitan",
+    "start": 1975
+  }
+]
