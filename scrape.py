@@ -103,7 +103,6 @@ def broken_urls():
     "https://www.hockey-reference.com/boxscores/201403100DAL.html"  # Rick Peverley medical emergency
   ]
 
-
 def stringy_now():
   return time.asctime(time.localtime())
 
