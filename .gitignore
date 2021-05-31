@@ -1,9 +1,10 @@
+.idea/
 env/
 static/gen/
 static/.webassets-cache/
 __pycache__/
 
+cruft/
 game_data/
 penalty_data/
 results/*
-response.json

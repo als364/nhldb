@@ -23,7 +23,7 @@ def main():
     schedule = get(f"https://statsapi.web.nhl.com/api/v1/schedule?season={season.season_id()}").json()
 
     response = get_pbp_data(2018020778)
-    with open("response.json", "w") as outfile:
+    with open("cruft/response.json", "w") as outfile:
       json.dump(response, outfile)
 
     regular_game_ids = []
@@ -68,7 +68,7 @@ def get_pbp_data(game_id):
     response = get(f"https://statsapi.web.nhl.com/api/v1/game/{game_id}/feed/live")
     content_type = response.headers['Content-Type'].lower()
     if (response.status_code == 200 and content_type is not None and content_type.find('json') > -1):
-      with open("response.json", "w") as file:
+      with open("cruft/response.json", "w") as file:
         json.dump(response.json(), file)
       return response.json()
     else:
