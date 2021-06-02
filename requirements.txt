@@ -18,6 +18,6 @@ requests==2.22.0
 simplejson==3.17.2
 six==1.14.0
 soupsieve==1.9.2
-urllib3==1.25.9
+urllib3==1.26.5
 webassets==2.0
 Werkzeug==1.0.1
