@@ -3,6 +3,8 @@ static/gen/
 static/.webassets-cache/
 __pycache__/
 
+.idea/
+
 game_data/
 penalty_data/
 results/*
